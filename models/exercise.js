@@ -46,10 +46,18 @@ export async function getExerciseLogForUser(
   }
 
   const logs = await db.all(sql, params);
+  const count = await db
+    .get(
+      'SELECT COUNT(*) as count FROM exercises WHERE userId = ?' +
+        (from ? ' AND date >= ?' : '') +
+        (to ? ' AND date <= ?' : ''),
+      [userId, ...(from ? [from] : []), ...(to ? [to] : [])]
+    )
+    .then((row) => row.count);
 
   return {
     ...user,
     logs: logs,
-    count: logs.length,
+    count: count,
   };
 }

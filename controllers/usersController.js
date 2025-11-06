@@ -7,8 +7,12 @@ export async function create(req, res) {
   const { username } = req.body || {};
   if (!username) return res.status(400).json({ error: 'username required' });
 
+  const usernameTrimmed = String(username).trim();
+  if (usernameTrimmed.length === 0)
+    return res.status(400).json({ error: 'username required' });
+
   try {
-    const user = await userModel.createUser(db, username);
+    const user = await userModel.createUser(db, usernameTrimmed);
     return res.status(201).json(user);
   } catch (err) {
     if (err && err.message && err.message.toLowerCase().includes('unique')) {
